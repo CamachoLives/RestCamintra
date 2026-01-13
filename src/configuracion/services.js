@@ -3,13 +3,7 @@ const { createError } = require('../middleware/errorHandler');
 
 const updateParametrizacionPlataforma = async (id, updateData) => {
   try {
-    if (!id) {
-      throw createError('ID del formulario requerido', 400);
-    }
-
-    if (!updateData || Object.keys(updateData).length === 0) {
-      throw createError('Datos de actualización requeridos', 400);
-    }
+    console.log("Aquiii")
     const updateParametrizacionPlataforma =
       await configuracionRepository.updateParametrizacionPlataforma(
         id,

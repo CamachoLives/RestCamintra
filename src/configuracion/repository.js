@@ -2,45 +2,64 @@
 const db = require('../database/index');
 
 const updateParametrizacionPlataforma = async (id, json) => {
+
+
+  const query = `
+    INSERT INTO plataforma (
+      id, 
+      logo_url, 
+      color_hex, 
+      ruta_almacenamiento, 
+      idioma, 
+      tiempo_sesion_minutos,
+      requiere_autenticacion,
+      mostrar_dashboard,
+      mostrar_carousel,
+      pass_longitud_minima,
+      pass_caducidad_dias
+    ) 
+    VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    ON CONFLICT (id) 
+    DO UPDATE SET 
+      logo_url = EXCLUDED.logo_url,
+      color_hex = EXCLUDED.color_hex,
+      ruta_almacenamiento = EXCLUDED.ruta_almacenamiento,
+      idioma = EXCLUDED.idioma,
+      tiempo_sesion_minutos = EXCLUDED.tiempo_sesion_minutos,
+      requiere_autenticacion = EXCLUDED.requiere_autenticacion,
+      mostrar_dashboard = EXCLUDED.mostrar_dashboard,
+      mostrar_carousel = EXCLUDED.mostrar_carousel,
+      pass_longitud_minima = EXCLUDED.pass_longitud_minima,
+      pass_caducidad_dias = EXCLUDED.pass_longitud_minima,
+      updated_at = CURRENT_TIMESTAMP
+    RETURNING *;
+  `;
+  const values = [
+    json.logo_url,
+    json.color_hex,
+    json.ruta_almacenamiento,
+    json.idioma,
+    json.tiempo_sesion_minutos,
+    json.requiere_autenticacion,
+    json.mostrar_dashboard,
+    json.mostrar_carousel,
+    json.pass_longitud_minima,
+    json.pass_caducidad_dias
+  ];
+
   try {
-
-    const query = `
-      UPDATE parametros
-      SET
-        logo = $1,
-        color_plataforma = $2,
-        ruta_almacenamiento = $3,
-        caducidad_dias = $4,
-        longitud_minima = $5,
-        carousel = $6,
-        dashboard = $7,
-        autenticacion = $8,
-        tiempo_sesion = $9
-      WHERE id = $10
-      RETURNING *;
-    `;
-    const values = [
-      json.logo || null,
-      json.color || null,
-      json.path || null,
-      json.caducidad || null,
-      json.longitudminimapass || null,
-      json.carousel || false,
-      json.dashboard || false,
-      json.autenticacion || false,
-      json.tiemposesion || null,
-      id,
-    ];
-
     const result = await db.query(query, values);
+    console.log("Configuración -->", result.rows[0]);
     return result.rows[0];
   } catch (error) {
     console.error('Error actualizando parametrización:', error);
     throw error;
   }
+
+
 };
 
-const getParametrizacionPlataforma = async(id) => {
+const getParametrizacionPlataforma = async (id) => {
   try {
     const query = `
       GET parametros
@@ -54,11 +73,12 @@ const getParametrizacionPlataforma = async(id) => {
     }
     const result = await db.query(query, values);
     return result.rows[0];
-    }
- catch (error) {
+  }
+  catch (error) {
     throw new Error("No se pudo ejecutar bien la query..!", error);
-    
-  }}
+
+  }
+}
 
 
 module.exports.configuracionRepository = {

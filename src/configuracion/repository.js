@@ -88,10 +88,8 @@ const getParametrizacionPlataforma = async (id) => {
   }
   catch (error) {
     throw new Error("No se pudo ejecutar bien la query..!", error);
-
   }
 }
-
 
 module.exports.configuracionRepository = {
   updateParametrizacionPlataforma,

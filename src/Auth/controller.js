@@ -17,7 +17,6 @@ module.exports.AuthController = {
       if (process.env.NODE_ENV !== 'production') {
         debug('Login successful for user:', email);
       }
-
       response.success(res, result.message, 200, {
         token: result.token,
         id: result.id,

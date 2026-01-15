@@ -35,16 +35,16 @@ const updateParametrizacionPlataforma = async (id, json) => {
     RETURNING *;
   `;
   const values = [
-    json.logo_url,
-    json.color_hex,
-    json.ruta_almacenamiento,
+    json.logo,
+    json.color,
+    json.path,
     json.idioma,
-    json.tiempo_sesion_minutos,
-    json.requiere_autenticacion,
-    json.mostrar_dashboard,
-    json.mostrar_carousel,
-    json.pass_longitud_minima,
-    json.pass_caducidad_dias
+    json.tiemposesion,
+    json.autenticacion,
+    json.dashboard,
+    json.carousel,
+    json.longitudminimapass,
+    json.caducidad
   ];
 
   try {

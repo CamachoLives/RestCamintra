@@ -23,12 +23,16 @@ const updateParametrizacionPlataforma = async (id, updateData) => {
 };
 
 const getParametrizacionPlataforma = async (id) => {
+  console.log("Servicio ID:", id);
   try {
-    if (!id) {
-
+    console.log("Servicio ID dentro del try:", id);
+    if (id) {
+      console.log("No hay ID");
       const getParametrizacionPlataforma =
       await configuracionRepository.getParametrizacionPlataforma(id);
+      console.log("Estoy aquiii", getParametrizacionPlataforma);
     if (!getParametrizacionPlataforma) {
+      console.log("No hay formulario");
       return null;
     }
 

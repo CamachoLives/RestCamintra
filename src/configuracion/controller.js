@@ -43,15 +43,20 @@ module.exports.configuracionController = {
     console.log("Estoy adentro");
 
     try {
-
+      console.log("Estoy adentro", req.params.id);
       const { id } = req.params;
-
+        console.log("ID:", id);
       if (!id) {
         throw createError('ID del formulario requerido', 400);
       }
 
       const Parametrizacion = await configuracionService.getParametrizacionPlataforma(id);
-      response.success(res, 'Formulario obtenido exitosamente', 200, Parametrizacion);
+      response.success(
+        res,
+        'Formulario obtenido exitosamente',
+        200,
+        Parametrizacion
+      );
 
     } catch (error) {
       next(error);

@@ -76,10 +76,9 @@ const getParametrizacionPlataforma = async (id) => {
     const query = `
       SELECT * FROM plataforma WHERE id = $1;
     `;
-    const values = {
-      id,
-    }
+    const values = [id];
     const result = await db.query(query, values);
+    console.log("Configuración obtenida -->", result.rows[0]);
     return result.rows[0];
   }
   catch (error) {

@@ -27,7 +27,7 @@ const connectDB = () => {
         });
 
         pool.on('error', err => {
-          debug('❌ Database connection error:', err);
+          debug('❌ Error en la conexión:', err);
           console.error('Database error:', err);
           reject(err);
         });

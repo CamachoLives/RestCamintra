@@ -3,7 +3,6 @@ const db = require('../database/index');
 
 const updateParametrizacionPlataforma = async (id, json) => {
 
-
   const query = `
     INSERT INTO plataforma (
       id, 

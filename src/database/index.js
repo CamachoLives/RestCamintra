@@ -23,7 +23,6 @@ const connectDB = () => {
         pool.on('connect', () => {
           debug('✅ Conectado a PostgreSQL');
           if (config.isDevelopment) {
-            console.log('📊 Database connected successfully');
           }
         });
 

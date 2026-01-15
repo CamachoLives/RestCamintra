@@ -63,7 +63,6 @@ const updateParametrizacionPlataforma = async (id, json) => {
 
   try {
     const result = await db.query(query, values);
-    console.log("Configuración -->", result.rows[0]);
     return result.rows[0];
   } catch (error) {
     console.error('Error actualizando parametrización:', error);
@@ -78,7 +77,6 @@ const getParametrizacionPlataforma = async (id) => {
     `;
     const values = [id];
     const result = await db.query(query, values);
-    console.log("Configuración obtenida -->", result.rows[0]);
     return result.rows[0];
   }
   catch (error) {

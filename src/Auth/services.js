@@ -10,7 +10,6 @@ const Login = async (email, password) => {
   try {
     // Buscar usuario por email
     const user = await authRepository.findByEmail(email);
-    //console.log("Pass has --> ", user.password);
 
     if (!user) {
       throw createError('Credenciales inválidas', 401);

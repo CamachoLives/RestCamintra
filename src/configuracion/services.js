@@ -3,7 +3,6 @@ const { createError } = require('../middleware/errorHandler');
 
 const updateParametrizacionPlataforma = async (id, updateData) => {
   try {
-    console.log("Aquiii")
     const updateParametrizacionPlataforma =
       await configuracionRepository.updateParametrizacionPlataforma(
         id,
@@ -23,16 +22,11 @@ const updateParametrizacionPlataforma = async (id, updateData) => {
 };
 
 const getParametrizacionPlataforma = async (id) => {
-  console.log("Servicio ID:", id);
   try {
-    console.log("Servicio ID dentro del try:", id);
     if (id) {
-      console.log("No hay ID");
       const getParametrizacionPlataforma =
       await configuracionRepository.getParametrizacionPlataforma(id);
-      console.log("Estoy aquiii", getParametrizacionPlataforma);
     if (!getParametrizacionPlataforma) {
-      console.log("No hay formulario");
       return null;
     }
 

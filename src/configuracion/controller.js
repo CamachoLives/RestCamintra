@@ -40,12 +40,9 @@ module.exports.configuracionController = {
   },
 
   getParametrizacionPlataforma: async (req, res, next) => {
-    console.log("Estoy adentro");
 
     try {
-      console.log("Estoy adentro", req.params.id);
       const { id } = req.params;
-        console.log("ID:", id);
       if (!id) {
         throw createError('ID del formulario requerido', 400);
       }

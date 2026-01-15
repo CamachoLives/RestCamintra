@@ -74,11 +74,7 @@ const updateParametrizacionPlataforma = async (id, json) => {
 const getParametrizacionPlataforma = async (id) => {
   try {
     const query = `
-      GET parametros
-      SET
-        logo = $1,
-      WHERE id = $10
-      RETURNING *;
+      SELECT * FROM plataforma WHERE id = $1;
     `;
     const values = {
       id,

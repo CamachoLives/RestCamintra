@@ -16,9 +16,14 @@ const updateParametrizacionPlataforma = async (id, json) => {
       mostrar_dashboard,
       mostrar_carousel,
       pass_longitud_minima,
-      pass_caducidad_dias
+      pass_caducidad_dias,
+      nombre_sitio,
+      favicon_url,
+      email_soporte,
+      modo_mantenimiento,
+      max_intentos_login
     ) 
-    VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
     ON CONFLICT (id) 
     DO UPDATE SET 
       logo_url = EXCLUDED.logo_url,
@@ -30,7 +35,12 @@ const updateParametrizacionPlataforma = async (id, json) => {
       mostrar_dashboard = EXCLUDED.mostrar_dashboard,
       mostrar_carousel = EXCLUDED.mostrar_carousel,
       pass_longitud_minima = EXCLUDED.pass_longitud_minima,
-      pass_caducidad_dias = EXCLUDED.pass_longitud_minima,
+      pass_caducidad_dias = EXCLUDED.pass_caducidad_dias,
+      nombre_sitio = EXCLUDED.nombre_sitio,
+      favicon_url = EXCLUDED.favicon_url,
+      email_soporte = EXCLUDED.email_soporte,
+      modo_mantenimiento = EXCLUDED.modo_mantenimiento,
+      max_intentos_login = EXCLUDED.max_intentos_login,
       updated_at = CURRENT_TIMESTAMP
     RETURNING *;
   `;
@@ -44,7 +54,12 @@ const updateParametrizacionPlataforma = async (id, json) => {
     json.dashboard,
     json.carousel,
     json.longitudminimapass,
-    json.caducidad
+    json.caducidad,
+    json.sitionombre,
+    json.favicon,
+    json.emailsoporte,
+    json.Mantenimiento,
+    json.maximointentos
   ];
 
   try {

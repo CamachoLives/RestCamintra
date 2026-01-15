@@ -69,8 +69,6 @@ const updateParametrizacionPlataforma = async (id, json) => {
     console.error('Error actualizando parametrización:', error);
     throw error;
   }
-
-
 };
 
 const getParametrizacionPlataforma = async (id) => {

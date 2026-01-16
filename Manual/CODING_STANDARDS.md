@@ -144,8 +144,6 @@ debug('Operation completed successfully:', { userId, operation });
 debug('Error occurred:', { error: error.message, context });
 
 // ❌ Incorrecto
-console.log('Success');
-console.error(error);
 ```
 
 ## 🛡️ **Seguridad**

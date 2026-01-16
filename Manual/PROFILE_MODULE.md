@@ -239,7 +239,6 @@ const profileData = {
 };
 
 profileService.createProfile(profileData).subscribe(response => {
-  console.log('Perfil creado:', response.data);
 });
 ```
 
@@ -253,7 +252,6 @@ const updateData = {
 };
 
 profileService.updateProfile(updateData).subscribe(response => {
-  console.log('Perfil actualizado:', response.data);
 });
 ```
 
@@ -268,7 +266,6 @@ profileService
     limit: 10,
   })
   .subscribe(response => {
-    console.log('Resultados:', response.data.profiles);
   });
 ```
 

@@ -93,7 +93,6 @@ try {
   const result = await someAsyncOperation();
   return result;
 } catch (error) {
-  console.log(error);
   throw error;
 }
 ```

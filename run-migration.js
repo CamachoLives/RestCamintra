@@ -13,8 +13,6 @@ const pool = new Pool({
 
 async function runMigration() {
   try {
-    console.log('🚀 Iniciando migración de la tabla user_profiles...');
-
     // Leer el archivo SQL
     const migrationPath = path.join(
       __dirname,
@@ -27,11 +25,6 @@ async function runMigration() {
     // Ejecutar la migración
     await pool.query(sqlContent);
 
-    console.log('✅ Migración ejecutada exitosamente');
-    console.log(
-      '📋 Tabla user_profiles creada con todos los índices y triggers'
-    );
-
     // Verificar que la tabla se creó correctamente
     const result = await pool.query(`
       SELECT table_name, column_name, data_type, is_nullable 
@@ -40,7 +33,6 @@ async function runMigration() {
       ORDER BY ordinal_position
     `);
 
-    console.log('\n📊 Estructura de la tabla user_profiles:');
     result.rows.forEach(row => {
       console.log(
         `  - ${row.column_name}: ${row.data_type} (${row.is_nullable === 'YES' ? 'nullable' : 'not null'})`

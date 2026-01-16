@@ -39,8 +39,6 @@ async function runMigration() {
       );
     });
   } catch (error) {
-    console.error('❌ Error ejecutando migración:', error.message);
-
     if (error.code === '42P07') {
       console.log('ℹ️  La tabla user_profiles ya existe');
     } else if (error.code === 'ECONNREFUSED') {

@@ -58,7 +58,5 @@ async function runMigration() {
     await pool.end();
   }
 }
-
-// Ejecutar migración
 runMigration();
 

@@ -11,6 +11,7 @@ const pool = new Pool({
   database: process.env.DB_NAME || 'calendar',
 });
 
+
 async function runMigration() {
   try {
     // Leer el archivo SQL

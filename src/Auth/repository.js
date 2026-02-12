@@ -16,6 +16,7 @@ const findByEmail = async email => {
   }
 };
 
+
 const create = async user => {
   try {
     const result = await db.query(

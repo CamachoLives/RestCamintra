@@ -12,6 +12,7 @@ const pool = new Pool({
 });
 
 
+
 async function runMigration() {
   try {
     // Leer el archivo SQL

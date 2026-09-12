@@ -19,6 +19,7 @@ const { Auth } = require('./src/Auth/');
 const { activities } = require('./src/Activities/index');
 const { Users } = require('./src/Users/index');
 const { Profile } = require('./src/Profile/index');
+const { Directorio } = require('./src/Directorio/index');
 const listEndpoints = require('express-list-endpoints');
 
 // Security middleware
@@ -51,6 +52,7 @@ app.get('/health', (req, res) => {
 Auth(app);
 Users(app);
 configuracion(app);
+Directorio(app);
 //activities(app);
 //Profile(app);
 

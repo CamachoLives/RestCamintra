@@ -1,6 +1,5 @@
 const { authRepository } = require('./repository');
 const { UsersRepository } = require('../Users/repository');
-const { UsersRepository } = require('../Users/repository');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { createError } = require('../middleware/errorHandler');

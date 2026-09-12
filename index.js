@@ -22,6 +22,7 @@ const { Profile } = require('./src/Profile/index');
 const { Directorio } = require('./src/Directorio/index');
 const { Comunicados } = require('./src/Comunicados/index');
 const { Calendar } = require('./src/Calendar/index');
+const { Documentos } = require('./src/Documentos/index');
 const listEndpoints = require('express-list-endpoints');
 
 // Security middleware
@@ -57,6 +58,7 @@ configuracion(app);
 Directorio(app);
 Comunicados(app);
 Calendar(app);
+Documentos(app);
 //activities(app);
 //Profile(app);
 

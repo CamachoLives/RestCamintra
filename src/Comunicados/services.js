@@ -1,6 +1,7 @@
 const { comunicadosRepository } = require('./repository');
 const { createError } = require('../middleware/errorHandler');
 const { PAGINATION } = require('../constants/index');
+const { notificationsService } = require('../Notifications/services');
 const debug = require('debug')('app:comunicados-service');
 
 const PRIORIDADES = ['baja', 'normal', 'alta', 'urgente'];
@@ -73,10 +74,22 @@ const crear = async (autorId, datos) => {
   try {
     validarDatos(datos);
 
-    return await comunicadosRepository.crear(autorId, {
+    const comunicado = await comunicadosRepository.crear(autorId, {
       ...datos,
       titulo: datos.titulo.trim(),
     });
+
+    if (comunicado.estado === 'publicado') {
+      await notificationsService.avisarATodos({
+        titulo: 'Nuevo comunicado',
+        mensaje: comunicado.titulo,
+        tipo: 'comunicado',
+        enlace: `/comunicados/${comunicado.id}`,
+        exceptoId: autorId,
+      });
+    }
+
+    return comunicado;
   } catch (error) {
     if (error.isOperational) throw error;
 

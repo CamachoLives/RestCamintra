@@ -1,5 +1,6 @@
 const { calendarRepository } = require('./repository');
 const { createError } = require('../middleware/errorHandler');
+const { notificationsService } = require('../Notifications/services');
 const debug = require('debug')('app:calendar-service');
 
 const TIPOS = ['evento', 'capacitacion', 'reunion', 'festivo', 'cumpleanos'];
@@ -68,10 +69,20 @@ const crear = async (creadoPor, datos) => {
   try {
     validarDatos(datos);
 
-    return await calendarRepository.crear(creadoPor, {
+    const evento = await calendarRepository.crear(creadoPor, {
       ...datos,
       titulo: datos.titulo.trim(),
     });
+
+    await notificationsService.avisarATodos({
+      titulo: 'Nuevo evento en el calendario',
+      mensaje: evento.titulo,
+      tipo: 'evento',
+      enlace: `/calendario?evento=${evento.id}`,
+      exceptoId: creadoPor,
+    });
+
+    return evento;
   } catch (error) {
     if (error.isOperational) throw error;
 

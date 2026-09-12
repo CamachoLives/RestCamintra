@@ -4,7 +4,7 @@ const debug = require('debug')('app:user-repository');
 
 // Campos que sí se pueden devolver al cliente (nunca password_hash)
 const CAMPOS_PUBLICOS = `
-  u.id, u.nombre, u.email, u.rol, u.activo, u.ultimo_acceso, u.created_at
+  u.id, u.nombre, u.email, u.rol, u.activo, u.ultimo_acceso
 `;
 
 // Solo estas columnas se dejan actualizar desde la API

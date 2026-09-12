@@ -57,6 +57,33 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
+// Middleware de autorización por rol.
+// Se usa siempre DESPUÉS de authenticateToken, que es quien llena req.user.
+const authorizeRoles = (...rolesPermitidos) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Token de acceso requerido',
+      });
+    }
+
+    if (!rolesPermitidos.includes(req.user.rol)) {
+      debug('Access denied for role:', req.user.rol);
+      return res.status(403).json({
+        success: false,
+        message: 'No tienes permisos para realizar esta acción',
+      });
+    }
+
+    next();
+  };
+};
+
+// Atajos para los dos casos más comunes de la intranet
+const soloAdmin = authorizeRoles('admin');
+const adminOEditor = authorizeRoles('admin', 'editor');
+
 // Middleware para sanitizar logs (evitar logs de información sensible)
 const sanitizeLogs = (req, res, next) => {
   const originalSend = res.send;
@@ -99,6 +126,9 @@ module.exports = {
   authRateLimit,
   generalRateLimit,
   authenticateToken,
+  authorizeRoles,
+  soloAdmin,
+  adminOEditor,
   sanitizeLogs,
   helmetConfig,
 };

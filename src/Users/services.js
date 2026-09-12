@@ -4,10 +4,11 @@ const debug = require('debug')('app:users-service');
 
 const getAllUsers = async (options = {}) => {
   try {
-    const { email, page = 1, limit = 10 } = options;
+    const { email, rol, page = 1, limit = 10 } = options;
 
     const users = await UsersRepository.getAllUsers({
       email,
+      rol,
       page: parseInt(page),
       limit: parseInt(limit),
     });
@@ -52,10 +53,7 @@ const updateUser = async (id, updateData) => {
       throw createError('Datos de actualización requeridos', 400);
     }
 
-    const updatedUser = await UsersRepository.updateUser(id, {
-      ...updateData,
-      updatedAt: new Date(),
-    });
+    const updatedUser = await UsersRepository.updateUser(id, updateData);
 
     if (!updatedUser) {
       return null;

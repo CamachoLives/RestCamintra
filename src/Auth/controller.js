@@ -20,9 +20,11 @@ module.exports.AuthController = {
       response.success(res, result.message, 200, {
         token: result.token,
         id: result.id,
+        nombre: result.nombre,
+        rol: result.rol,
       });
     } catch (error) {
-      next('Siguiente error --> ', error);
+      next(error);
     }
   },
 
@@ -60,6 +62,8 @@ module.exports.AuthController = {
         user: {
           id: req.user.id,
           email: req.user.email,
+          nombre: req.user.nombre,
+          rol: req.user.rol,
         },
       });
     } catch (error) {

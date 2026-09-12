@@ -6,15 +6,37 @@ const { createError } = require('../middleware/errorHandler');
 module.exports.usersController = {
   getAllUsers: async (req, res, next) => {
     try {
-      const { email, page = 1, limit = 10 } = req.query;
+      const { email, rol, page = 1, limit = 10 } = req.query;
 
       const users = await usersService.getAllUsers({
         email,
+        rol,
         page: parseInt(page),
         limit: parseInt(limit),
       });
 
       response.success(res, 'Usuarios obtenidos exitosamente', 200, users);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // Datos del usuario del token, sin tener que conocer su id
+  getMe: async (req, res, next) => {
+    try {
+      const user = await usersService.getUserById(req.user.id);
+
+      if (!user) {
+        throw createError('Usuario no encontrado', 404);
+      }
+
+      const { password_hash, ...userWithoutPassword } = user;
+      response.success(
+        res,
+        'Usuario obtenido exitosamente',
+        200,
+        userWithoutPassword
+      );
     } catch (error) {
       next(error);
     }
@@ -98,7 +120,7 @@ module.exports.usersController = {
         throw createError('Usuario no encontrado', 404);
       }
 
-      response.success(res, 'Usuario eliminado exitosamente', 200);
+      response.success(res, 'Usuario desactivado exitosamente', 200);
     } catch (error) {
       next(error);
     }

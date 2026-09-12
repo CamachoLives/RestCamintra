@@ -1,4 +1,6 @@
 const { authRepository } = require('./repository');
+const { UsersRepository } = require('../Users/repository');
+const { UsersRepository } = require('../Users/repository');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { createError } = require('../middleware/errorHandler');
@@ -13,6 +15,10 @@ const Login = async (email, password) => {
 
     if (!user) {
       throw createError('Credenciales inválidas', 401);
+    }
+
+    if (user.activo === false) {
+      throw createError('El usuario está inactivo, contacta al administrador', 403);
     }
 
     if (!user.password_hash) {
@@ -31,6 +37,7 @@ const Login = async (email, password) => {
         id: user.id,
         email: user.email,
         nombre: user.nombre,
+        rol: user.rol || 'colaborador',
       },
       JWT_SECRET,
       {
@@ -40,12 +47,17 @@ const Login = async (email, password) => {
       }
     );
 
+    // Sello de último acceso para el panel de administración
+    await UsersRepository.updateUltimoAcceso(user.id);
+
     debug('Login successful for user:', user.email);
 
     return {
       message: 'Inicio de sesión exitoso',
       token: token,
       id: user.id,
+      rol: user.rol || 'colaborador',
+      nombre: user.nombre,
     };
   } catch (error) {
     debug('Login error:', error.message);

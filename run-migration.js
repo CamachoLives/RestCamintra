@@ -1,6 +1,7 @@
 const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config();
 
 // Configuración de la base de datos
 const pool = new Pool({
@@ -11,52 +12,75 @@ const pool = new Pool({
   database: process.env.DB_NAME || 'calendar',
 });
 
-async function runMigration() {
+const MIGRATIONS_DIR = path.join(__dirname, 'database', 'migrations');
+
+// Tabla de control: guarda qué migraciones ya se aplicaron
+const ensureMigrationsTable = async () => {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS schema_migrations (
+      nombre VARCHAR(255) PRIMARY KEY,
+      aplicada_en TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    )
+  `);
+};
+
+const getApplied = async () => {
+  const result = await pool.query('SELECT nombre FROM schema_migrations');
+  return new Set(result.rows.map(row => row.nombre));
+};
+
+const runMigrations = async () => {
   try {
-    // Leer el archivo SQL
-    const migrationPath = path.join(
-      __dirname,
-      'database',
-      'migrations',
-      '001_create_user_profiles_table.sql'
-    );
-    const sqlContent = fs.readFileSync(migrationPath, 'utf8');
+    await ensureMigrationsTable();
+    const applied = await getApplied();
 
-    // Ejecutar la migración
-    await pool.query(sqlContent);
+    const pending = fs
+      .readdirSync(MIGRATIONS_DIR)
+      .filter(file => file.endsWith('.sql'))
+      .sort()
+      .filter(file => !applied.has(file));
 
-    // Verificar que la tabla se creó correctamente
-    const result = await pool.query(`
-      SELECT table_name, column_name, data_type, is_nullable 
-      FROM information_schema.columns 
-      WHERE table_name = 'user_profiles' 
-      ORDER BY ordinal_position
-    `);
+    if (pending.length === 0) {
+      console.log('✅ Base de datos al día, no hay migraciones pendientes');
+      return;
+    }
 
-    result.rows.forEach(row => {
-      console.log(
-        `  - ${row.column_name}: ${row.data_type} (${row.is_nullable === 'YES' ? 'nullable' : 'not null'})`
-      );
-    });
+    for (const file of pending) {
+      const sql = fs.readFileSync(path.join(MIGRATIONS_DIR, file), 'utf8');
+      console.log(`▶️  Aplicando ${file}...`);
+
+      await pool.query('BEGIN');
+      try {
+        await pool.query(sql);
+        await pool.query(
+          'INSERT INTO schema_migrations (nombre) VALUES ($1)',
+          [file]
+        );
+        await pool.query('COMMIT');
+        console.log(`✅ ${file} aplicada`);
+      } catch (error) {
+        await pool.query('ROLLBACK');
+        throw new Error(`Falló ${file}: ${error.message}`);
+      }
+    }
+
+    console.log(`🎉 ${pending.length} migración(es) aplicada(s)`);
   } catch (error) {
-    if (error.code === '42P07') {
-      console.log('ℹ️  La tabla user_profiles ya existe');
-    } else if (error.code === 'ECONNREFUSED') {
-      console.log(
-        '❌ Error de conexión a la base de datos. Verifica que PostgreSQL esté ejecutándose'
+    if (error.code === 'ECONNREFUSED') {
+      console.error(
+        '❌ Error de conexión. Verifica que PostgreSQL esté ejecutándose'
       );
     } else if (error.code === '28P01') {
-      console.log(
-        '❌ Error de autenticación. Verifica las credenciales de la base de datos'
-      );
+      console.error('❌ Error de autenticación. Revisa DB_USER y DB_PASSWORD');
     } else if (error.code === '3D000') {
-      console.log(
-        '❌ La base de datos no existe. Crea la base de datos calendario_db primero'
-      );
+      console.error(`❌ La base de datos "${process.env.DB_NAME}" no existe`);
+    } else {
+      console.error(`❌ ${error.message}`);
     }
+    process.exitCode = 1;
   } finally {
     await pool.end();
   }
-}
-runMigration();
+};
 
+runMigrations();

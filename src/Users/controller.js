@@ -1,4 +1,3 @@
-// const debug = require('debug')('app:users-controller');
 const { usersService } = require('./services');
 const { response } = require('../common/response');
 const { createError } = require('../middleware/errorHandler');
@@ -30,13 +29,7 @@ module.exports.usersController = {
         throw createError('Usuario no encontrado', 404);
       }
 
-      const { password_hash, ...userWithoutPassword } = user;
-      response.success(
-        res,
-        'Usuario obtenido exitosamente',
-        200,
-        userWithoutPassword
-      );
+      response.success(res, 'Usuario obtenido exitosamente', 200, user);
     } catch (error) {
       next(error);
     }
@@ -56,14 +49,7 @@ module.exports.usersController = {
         throw createError('Usuario no encontrado', 404);
       }
 
-      // No devolver información sensible
-      const { password_hash, ...userWithoutPassword } = user;
-      response.success(
-        res,
-        'Usuario obtenido exitosamente',
-        200,
-        userWithoutPassword
-      );
+      response.success(res, 'Usuario obtenido exitosamente', 200, user);
     } catch (error) {
       next(error);
     }
@@ -93,13 +79,11 @@ module.exports.usersController = {
         throw createError('Usuario no encontrado', 404);
       }
 
-      // No devolver información sensible
-      const { password_hash, ...userWithoutPassword } = updatedUser;
       response.success(
         res,
         'Usuario actualizado exitosamente',
         200,
-        userWithoutPassword
+        updatedUser
       );
     } catch (error) {
       next(error);

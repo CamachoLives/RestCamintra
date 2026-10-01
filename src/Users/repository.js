@@ -2,33 +2,33 @@
 const db = require('../database/index');
 const debug = require('debug')('app:user-repository');
 
-// Campos que sí se pueden devolver al cliente (nunca password_hash)
+// Campos que sí se pueden devolver al cliente.
+//
+// Ninguna consulta de este repositorio usa SELECT *: el password_hash no
+// debe salir de aquí. Antes salía y cada controlador lo quitaba a mano con
+// un destructuring, así que bastaba olvidarlo una vez -- o dejarlo caer en
+// un debug -- para filtrar el hash. Quien necesita verificar la contraseña
+// es Auth, y para eso tiene su propio authRepository.findByEmail.
 const CAMPOS_PUBLICOS = `
   u.id, u.nombre, u.email, u.rol, u.activo, u.ultimo_acceso
 `;
 
+// Los mismos campos sin el alias, para los RETURNING
+const CAMPOS_PUBLICOS_SIN_ALIAS = CAMPOS_PUBLICOS.replace(/u\./g, '');
+
 // Solo estas columnas se dejan actualizar desde la API
 const CAMPOS_EDITABLES = ['nombre', 'email', 'rol', 'activo'];
 
-const getEverything = async email => {
-  try {
-    const res = await db.query('SELECT * FROM usuarios WHERE email = $1', [
-      email,
-    ]);
-    return res.rows[0]; // return the first matching user
-  } catch (error) {
-    debug("user don't found:", error);
-    throw error;
-  }
-};
-
 const getUserById = async id => {
   try {
-    const result = await db.query('SELECT * FROM usuarios WHERE id = $1', [id]);
+    const result = await db.query(
+      `SELECT ${CAMPOS_PUBLICOS} FROM usuarios u WHERE u.id = $1`,
+      [id]
+    );
 
     return result.rows[0] || null;
   } catch (error) {
-    console.error('❌ Error en getUserById (repository):', error);
+    debug('Error obteniendo usuario por id:', error);
     throw error;
   }
 };
@@ -92,7 +92,7 @@ const updateUser = async (id, updateData) => {
       `UPDATE usuarios
        SET ${sets.join(', ')}
        WHERE id = $${valores.length}
-       RETURNING *`,
+       RETURNING ${CAMPOS_PUBLICOS_SIN_ALIAS}`,
       valores
     );
 
@@ -108,7 +108,7 @@ const updateUser = async (id, updateData) => {
 const deleteUser = async id => {
   try {
     const result = await db.query(
-      `UPDATE usuarios SET activo = FALSE WHERE id = $1 RETURNING id`,
+      'UPDATE usuarios SET activo = FALSE WHERE id = $1 RETURNING id',
       [id]
     );
 
@@ -131,10 +131,10 @@ const updateUltimoAcceso = async id => {
 };
 
 module.exports.UsersRepository = {
-  getEverything,
   getUserById,
   getAllUsers,
   updateUser,
   deleteUser,
   updateUltimoAcceso,
+  CAMPOS_EDITABLES,
 };

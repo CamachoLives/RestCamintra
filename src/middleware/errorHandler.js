@@ -13,12 +13,62 @@ class AppError extends Error {
   }
 }
 
-// Middleware de manejo de errores
-const errorHandler = (err, req, res, _next) => {
-  let error = { ...err };
-  error.message = err.message;
+/**
+ * Traduce los errores de las librerías a AppError, con un mensaje que el
+ * usuario pueda entender. Lo que no reconoce lo devuelve tal cual, para
+ * que siga siendo un error inesperado y no se filtre el detalle interno.
+ */
+const traducirError = err => {
+  // Validación de Mongoose
+  if (err.name === 'ValidationError' && err.errors) {
+    const mensaje = Object.values(err.errors)
+      .map(val => val.message)
+      .join(', ');
+    return new AppError(mensaje, 400);
+  }
 
-  // Log del error
+  // Duplicado en base de datos (MongoDB)
+  if (err.code === 11000 && err.keyValue) {
+    const campo = Object.keys(err.keyValue)[0];
+    return new AppError(`${campo} ya existe`, 400);
+  }
+
+  // JWT
+  if (err.name === 'JsonWebTokenError') {
+    return new AppError('Token inválido', 401);
+  }
+
+  if (err.name === 'TokenExpiredError') {
+    return new AppError('Token expirado', 401);
+  }
+
+  // PostgreSQL: conexión caída y error de sintaxis en la consulta
+  if (err.code === 'ECONNREFUSED') {
+    return new AppError('Error de conexión a la base de datos', 500);
+  }
+
+  if (err.code === '42601') {
+    return new AppError('Error en la consulta a la base de datos', 500);
+  }
+
+  // Violación de llave foránea
+  if (err.code === '23503') {
+    return new AppError('El registro referenciado no existe', 400);
+  }
+
+  return err;
+};
+
+/**
+ * Último eslabón de la cadena: cualquier next(error) termina aquí.
+ *
+ * Antes armaba un objeto plano `{ success, message }` y se lo pasaba a
+ * response.error, que al no encontrarle isOperational lo trataba como un
+ * fallo inesperado. En producción eso convertía todo -- un 404 de ruta
+ * inexistente, un 400 de validación -- en "Error interno del servidor".
+ * Ahora se le pasa el error, que es quien sabe si es operacional.
+ */
+const errorHandler = (err, req, res, _next) => {
   debug('Error occurred:', {
     message: err.message,
     stack: err.stack,
@@ -28,54 +78,9 @@ const errorHandler = (err, req, res, _next) => {
     userAgent: req.get('User-Agent'),
   });
 
-  // Error de validación de Mongoose
-  if (err.name === 'ValidationError') {
-    const message = Object.values(err.errors)
-      .map(val => val.message)
-      .join(', ');
-    error = new AppError(message, 400);
-  }
+  const error = traducirError(err);
 
-  // Error de duplicado en base de datos
-  if (err.code === 11000) {
-    const field = Object.keys(err.keyValue)[0];
-    const message = `${field} ya existe`;
-    error = new AppError(message, 400);
-  }
-
-  // Error de JWT
-  if (err.name === 'JsonWebTokenError') {
-    error = new AppError('Token inválido', 401);
-  }
-
-  if (err.name === 'TokenExpiredError') {
-    error = new AppError('Token expirado', 401);
-  }
-
-  // Error de base de datos
-  if (err.code === 'ECONNREFUSED') {
-    error = new AppError('Error de conexión a la base de datos', 500);
-  }
-
-  // Error de sintaxis SQL
-  if (err.code === '42601') {
-    error = new AppError('Error en la consulta a la base de datos', 500);
-  }
-
-  // Respuesta del error
-  const statusCode = error.statusCode || 500;
-  const message = error.isOperational
-    ? error.message
-    : 'Error interno del servidor';
-
-  // En desarrollo, incluir stack trace
-  const errorResponse = {
-    success: false,
-    message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
-  };
-
-  response.error(res, errorResponse, statusCode);
+  response.error(res, error, error.statusCode || 500);
 };
 
 // Middleware para rutas no encontradas
@@ -94,4 +99,5 @@ module.exports = {
   errorHandler,
   notFound,
   createError,
+  traducirError,
 };

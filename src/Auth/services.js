@@ -7,10 +7,16 @@ const debug = require('debug')('app:auth-services');
 
 const { JWT_SECRET, JWT_EXPIRES_IN, BCRYPT_ROUNDS } = process.env;
 
+// El teclado del movil capitaliza y el autocompletado deja espacios:
+// el email se normaliza antes de buscar y antes de guardar.
+const normalizarEmail = email =>
+  String(email ?? '')
+    .trim()
+    .toLowerCase();
+
 const Login = async (email, password) => {
   try {
-    // Buscar usuario por email
-    const user = await authRepository.findByEmail(email);
+    const user = await authRepository.findByEmail(normalizarEmail(email));
 
     if (!user) {
       throw createError('Credenciales inválidas', 401);
@@ -70,7 +76,9 @@ const Login = async (email, password) => {
 const Register = async (nombre, email, password) => {
   try {
     // Verificar si el usuario ya existe
-    const exists = await authRepository.findByEmail(email);
+    const emailNormalizado = normalizarEmail(email);
+
+    const exists = await authRepository.findByEmail(emailNormalizado);
     if (exists) {
       throw createError('El email ya está en uso', 409);
     }
@@ -82,7 +90,7 @@ const Register = async (nombre, email, password) => {
     // Crear nuevo usuario
     const newUser = await authRepository.create({
       nombre: nombre.trim(),
-      email: email.toLowerCase().trim(),
+      email: emailNormalizado,
       password: hashedPassword,
     });
 

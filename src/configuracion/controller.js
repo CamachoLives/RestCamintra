@@ -1,59 +1,40 @@
 const { configuracionService } = require('./services');
-const { createError } = require('../middleware/errorHandler');
 const { response } = require('../common/response');
+const { createError } = require('../middleware/errorHandler');
 
 module.exports.configuracionController = {
-  updateParametrizacionPlataforma: async (req, res) => {
+  obtener: async (req, res, next) => {
     try {
-      let id = 0;
-      const updateData = req.body;
+      const parametrizacion = await configuracionService.obtener();
 
-      if (req.params[0] === undefined) {
-        id = 1;
-      } else {
-        id = req.params.id;
+      if (!parametrizacion) {
+        throw createError('La plataforma no está parametrizada todavía', 404);
       }
 
-      if (!updateData || Object.keys(updateData).length === 0) {
-        throw createError('Datos de actualización son requeridos', 400);
-      }
-
-      const updateParametrizacionPlataforma =
-        await configuracionService.updateParametrizacionPlataforma(
-          id,
-          updateData
-        );
-
-      if (!updateParametrizacionPlataforma) {
-        throw createError('Formulario base no encontrado', 404);
-      }
       response.success(
         res,
-        'Formulario actualizado correctamente ',
+        'Parametrización obtenida exitosamente',
         200,
-        updateParametrizacionPlataforma
+        parametrizacion
       );
     } catch (error) {
-      res.status(404).json({ message: error.message });
+      next(error);
     }
   },
 
-  getParametrizacionPlataforma: async (req, res, next) => {
+  actualizar: async (req, res, next) => {
     try {
-      const { id } = req.params;
-      if (!id) {
-        throw createError('ID del formulario requerido', 400);
-      }
+      const parametrizacion = await configuracionService.actualizar(req.body);
 
-      const Parametrizacion =
-        await configuracionService.getParametrizacionPlataforma(id);
       response.success(
         res,
-        'Formulario obtenido exitosamente',
+        'Parametrización actualizada correctamente',
         200,
-        Parametrizacion
+        parametrizacion
       );
     } catch (error) {
+      // Antes este catch respondía 404 a cualquier fallo -- validación,
+      // permisos, caída de la base -- y nunca llegaba al errorHandler.
       next(error);
     }
   },

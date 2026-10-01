@@ -1,0 +1,21 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno (usar env.example como plantilla)
+.env
+.env.local
+.env.*.local
+
+# Pruebas
+coverage/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Sistema operativo / editores
+.DS_Store
+Thumbs.db
+.idea/
+*.swp

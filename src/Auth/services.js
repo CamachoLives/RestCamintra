@@ -17,13 +17,16 @@ const Login = async (email, password) => {
     }
 
     if (user.activo === false) {
-      throw createError('El usuario está inactivo, contacta al administrador', 403);
+      throw createError(
+        'El usuario está inactivo, contacta al administrador',
+        403
+      );
     }
 
     if (!user.password_hash) {
       throw createError('El usuario no tiene contraseña registrada', 400);
     }
-    
+
     // Verificar contraseña
     const match = await bcrypt.compare(password, user.password_hash);
     if (!match) {

@@ -5,7 +5,10 @@ const debug = require('debug')('app:directorio-service');
 
 const listar = async (opciones = {}) => {
   try {
-    const page = Math.max(parseInt(opciones.page) || PAGINATION.DEFAULT_PAGE, 1);
+    const page = Math.max(
+      parseInt(opciones.page) || PAGINATION.DEFAULT_PAGE,
+      1
+    );
     const limit = Math.min(
       parseInt(opciones.limit) || 20,
       PAGINATION.MAX_LIMIT

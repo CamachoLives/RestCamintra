@@ -97,7 +97,7 @@ const sanitizeLogs = (req, res, next) => {
           debug('Response contains sensitive data, not logging');
           return originalSend.call(this, data);
         }
-      } catch (e) {
+      } catch {
         // Si no es JSON, continuar normalmente
       }
     }

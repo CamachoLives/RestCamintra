@@ -72,7 +72,12 @@ module.exports.directorioController = {
     try {
       const departamento = await directorioService.crearDepartamento(req.body);
 
-      response.success(res, 'Departamento creado exitosamente', 201, departamento);
+      response.success(
+        res,
+        'Departamento creado exitosamente',
+        201,
+        departamento
+      );
     } catch (error) {
       next(error);
     }

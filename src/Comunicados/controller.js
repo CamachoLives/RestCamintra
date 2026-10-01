@@ -43,7 +43,12 @@ module.exports.comunicadosController = {
         throw createError('Comunicado no encontrado', 404);
       }
 
-      response.success(res, 'Comunicado obtenido exitosamente', 200, comunicado);
+      response.success(
+        res,
+        'Comunicado obtenido exitosamente',
+        200,
+        comunicado
+      );
     } catch (error) {
       next(error);
     }

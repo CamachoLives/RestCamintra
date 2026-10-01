@@ -6,7 +6,7 @@ module.exports.response = {
     res,
     message = 'Operación exitosa',
     statusCode = 200,
-    data = null,
+    data = null
   ) => {
     const response = {
       success: true,

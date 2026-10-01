@@ -43,10 +43,14 @@ const CAMPOS_EDITABLES = [
 ];
 
 // Un comunicado está vigente si está publicado y no se le pasó la fecha
-const VIGENTE = `c.estado = 'publicado' AND (c.expira_en IS NULL OR c.expira_en > NOW())`;
+const VIGENTE =
+  "c.estado = 'publicado' AND (c.expira_en IS NULL OR c.expira_en > NOW())";
 
-const construirFiltros = ({ q, categoriaId, prioridad, soloNoLeidos, incluirBorradores }, valores) => {
-  const condiciones = [incluirBorradores ? `c.estado <> 'archivado'` : VIGENTE];
+const construirFiltros = (
+  { q, categoriaId, prioridad, soloNoLeidos, incluirBorradores },
+  valores
+) => {
+  const condiciones = [incluirBorradores ? "c.estado <> 'archivado'" : VIGENTE];
 
   if (q) {
     valores.push(`%${q}%`);
@@ -66,7 +70,7 @@ const construirFiltros = ({ q, categoriaId, prioridad, soloNoLeidos, incluirBorr
   }
 
   if (soloNoLeidos) {
-    condiciones.push(`l.usuario_id IS NULL`);
+    condiciones.push('l.usuario_id IS NULL');
   }
 
   return condiciones.join(' AND ');
@@ -166,10 +170,10 @@ const actualizar = async (id, usuarioId, datos) => {
 
   // Al publicar por primera vez se sella publicado_en
   if (datos.estado === 'publicado') {
-    sets.push(`publicado_en = COALESCE(publicado_en, NOW())`);
+    sets.push('publicado_en = COALESCE(publicado_en, NOW())');
   }
 
-  sets.push(`updated_at = NOW()`);
+  sets.push('updated_at = NOW()');
   valores.push(id);
 
   const result = await db.query(

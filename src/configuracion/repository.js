@@ -1,8 +1,8 @@
 // src/modules/users/user.repository.js
 const db = require('../database/index');
+const debug = require('debug')('app:configuracion-repository');
 
 const updateParametrizacionPlataforma = async (id, json) => {
-
   const query = `
     INSERT INTO plataforma (
       id, 
@@ -58,19 +58,19 @@ const updateParametrizacionPlataforma = async (id, json) => {
     json.favicon,
     json.emailsoporte,
     json.Mantenimiento,
-    json.maximointentos
+    json.maximointentos,
   ];
 
   try {
     const result = await db.query(query, values);
     return result.rows[0];
   } catch (error) {
-    console.error('Error actualizando parametrización:', error);
+    debug('Error actualizando parametrización:', error);
     throw error;
   }
 };
 
-const getParametrizacionPlataforma = async (id) => {
+const getParametrizacionPlataforma = async id => {
   try {
     const query = `
       SELECT * FROM plataforma WHERE id = $1;
@@ -78,13 +78,12 @@ const getParametrizacionPlataforma = async (id) => {
     const values = [id];
     const result = await db.query(query, values);
     return result.rows[0];
+  } catch (error) {
+    throw new Error('No se pudo ejecutar bien la query..!', error);
   }
-  catch (error) {
-    throw new Error("No se pudo ejecutar bien la query..!", error);
-  }
-}
+};
 
 module.exports.configuracionRepository = {
   updateParametrizacionPlataforma,
-  getParametrizacionPlataforma
+  getParametrizacionPlataforma,
 };

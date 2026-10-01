@@ -34,9 +34,12 @@ const CAMPOS_EDITABLES = [
   'departamento_id',
 ];
 
-const construirFiltros = ({ q, categoria, etiqueta, incluirBorradores }, valores) => {
+const construirFiltros = (
+  { q, categoria, etiqueta, incluirBorradores },
+  valores
+) => {
   const condiciones = [
-    incluirBorradores ? `d.estado <> 'archivado'` : `d.estado = 'publicado'`,
+    incluirBorradores ? "d.estado <> 'archivado'" : "d.estado = 'publicado'",
   ];
 
   if (q) {
@@ -109,7 +112,7 @@ const obtenerPorId = async id => {
 // La lectura por slug suma una vista en la misma consulta
 const obtenerPorSlug = async slug => {
   const actualizado = await db.query(
-    `UPDATE documentos SET vistas = vistas + 1 WHERE slug = $1 RETURNING id`,
+    'UPDATE documentos SET vistas = vistas + 1 WHERE slug = $1 RETURNING id',
     [slug]
   );
 

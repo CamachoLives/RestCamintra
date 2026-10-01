@@ -6,7 +6,11 @@ const router = express.Router();
 module.exports.Documentos = app => {
   // El detalle va por slug, que es lo que se ve en la URL de la wiki
   router
-    .get('/categorias', authenticateToken, documentosController.listarCategorias)
+    .get(
+      '/categorias',
+      authenticateToken,
+      documentosController.listarCategorias
+    )
     .get('/', authenticateToken, documentosController.listar)
     .get('/:slug', authenticateToken, documentosController.obtener)
     .post('/', authenticateToken, adminOEditor, documentosController.crear)

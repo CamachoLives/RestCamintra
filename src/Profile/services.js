@@ -63,7 +63,7 @@ const updateProfile = async (userId, updateData) => {
 
     const updatedProfile = await profileRepository.updateProfile(
       userId,
-      updateData,
+      updateData
     );
 
     if (!updatedProfile) {
@@ -93,7 +93,7 @@ const updateProfileImage = async (userId, imageUrl) => {
 
     const updatedProfile = await profileRepository.updateProfileImage(
       userId,
-      imageUrl,
+      imageUrl
     );
 
     if (!updatedProfile) {
@@ -189,4 +189,3 @@ module.exports.profileService = {
   getAllProfiles,
   getOrCreateProfile,
 };
-

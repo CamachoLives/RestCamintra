@@ -89,7 +89,7 @@ const update = async (id, updateData) => {
           updatedAt: new Date(),
         },
       },
-      { returnDocument: 'after' },
+      { returnDocument: 'after' }
     );
 
     if (!result.value) {

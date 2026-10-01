@@ -18,7 +18,12 @@ module.exports.documentosController = {
         limit,
       });
 
-      response.success(res, 'Documentos obtenidos exitosamente', 200, resultado);
+      response.success(
+        res,
+        'Documentos obtenidos exitosamente',
+        200,
+        resultado
+      );
     } catch (error) {
       next(error);
     }

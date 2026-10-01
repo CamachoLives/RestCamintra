@@ -11,13 +11,13 @@ module.exports.activitiesController = {
         res,
         'Actividades obtenidas exitosamente',
         200,
-        activities,
+        activities
       );
     } catch (error) {
       next(error);
     }
   },
-//
+  //
   getActivityById: async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -76,7 +76,7 @@ module.exports.activitiesController = {
         res,
         'Actividad actualizada exitosamente',
         200,
-        updatedActivity,
+        updatedActivity
       );
     } catch (error) {
       next(error);

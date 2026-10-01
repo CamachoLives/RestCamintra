@@ -5,11 +5,11 @@ const { response } = require('../common/response');
 module.exports.configuracionController = {
   updateParametrizacionPlataforma: async (req, res) => {
     try {
-      let id = 0
+      let id = 0;
       const updateData = req.body;
 
-      if (req.params[0] == null) {
-        id = 1
+      if (req.params[0] === undefined) {
+        id = 1;
       } else {
         id = req.params.id;
       }
@@ -17,7 +17,6 @@ module.exports.configuracionController = {
       if (!updateData || Object.keys(updateData).length === 0) {
         throw createError('Datos de actualización son requeridos', 400);
       }
-
 
       const updateParametrizacionPlataforma =
         await configuracionService.updateParametrizacionPlataforma(
@@ -40,25 +39,22 @@ module.exports.configuracionController = {
   },
 
   getParametrizacionPlataforma: async (req, res, next) => {
-
     try {
       const { id } = req.params;
       if (!id) {
         throw createError('ID del formulario requerido', 400);
       }
 
-      const Parametrizacion = await configuracionService.getParametrizacionPlataforma(id);
+      const Parametrizacion =
+        await configuracionService.getParametrizacionPlataforma(id);
       response.success(
         res,
         'Formulario obtenido exitosamente',
         200,
         Parametrizacion
       );
-
     } catch (error) {
       next(error);
-
     }
-
-  }
+  },
 };

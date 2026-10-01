@@ -132,7 +132,9 @@ describe('UsersRepository.deleteUser', () => {
     db.query.mockResolvedValue({ rowCount: 1 });
 
     await expect(UsersRepository.deleteUser(3)).resolves.toBe(true);
-    expect(sqlDeLaUltimaLlamada()).toMatch(/UPDATE usuarios SET activo = FALSE/);
+    expect(sqlDeLaUltimaLlamada()).toMatch(
+      /UPDATE usuarios SET activo = FALSE/
+    );
     expect(sqlDeLaUltimaLlamada()).not.toMatch(/DELETE/i);
   });
 
@@ -147,6 +149,8 @@ describe('UsersRepository.updateUltimoAcceso', () => {
   it('no tumba el login si falla el sello de acceso', async () => {
     db.query.mockRejectedValue(new Error('timeout'));
 
-    await expect(UsersRepository.updateUltimoAcceso(3)).resolves.toBeUndefined();
+    await expect(
+      UsersRepository.updateUltimoAcceso(3)
+    ).resolves.toBeUndefined();
   });
 });

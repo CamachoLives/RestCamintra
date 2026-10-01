@@ -5,19 +5,14 @@ const debug = require('debug')('app:dashboard-service');
 // Una sola llamada arma toda la portada de la intranet
 const resumen = async usuarioId => {
   try {
-    const [
-      indicadores,
-      comunicados,
-      eventos,
-      documentos,
-      porDepartamento,
-    ] = await Promise.all([
-      dashboardRepository.indicadores(usuarioId),
-      dashboardRepository.ultimosComunicados(usuarioId, 5),
-      dashboardRepository.proximosEventos(5),
-      dashboardRepository.documentosRecientes(5),
-      dashboardRepository.colaboradoresPorDepartamento(),
-    ]);
+    const [indicadores, comunicados, eventos, documentos, porDepartamento] =
+      await Promise.all([
+        dashboardRepository.indicadores(usuarioId),
+        dashboardRepository.ultimosComunicados(usuarioId, 5),
+        dashboardRepository.proximosEventos(5),
+        dashboardRepository.documentosRecientes(5),
+        dashboardRepository.colaboradoresPorDepartamento(),
+      ]);
 
     return {
       indicadores,

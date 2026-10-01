@@ -19,7 +19,10 @@ const validarDatos = (datos, { parcial = false } = {}) => {
   }
 
   if (datos.prioridad && !PRIORIDADES.includes(datos.prioridad)) {
-    throw createError(`Prioridad inválida, use: ${PRIORIDADES.join(', ')}`, 400);
+    throw createError(
+      `Prioridad inválida, use: ${PRIORIDADES.join(', ')}`,
+      400
+    );
   }
 
   if (datos.estado && !ESTADOS.includes(datos.estado)) {
@@ -33,7 +36,10 @@ const validarDatos = (datos, { parcial = false } = {}) => {
 
 const listar = async (usuarioId, opciones = {}) => {
   try {
-    const page = Math.max(parseInt(opciones.page) || PAGINATION.DEFAULT_PAGE, 1);
+    const page = Math.max(
+      parseInt(opciones.page) || PAGINATION.DEFAULT_PAGE,
+      1
+    );
     const limit = Math.min(
       parseInt(opciones.limit) || PAGINATION.DEFAULT_LIMIT,
       PAGINATION.MAX_LIMIT

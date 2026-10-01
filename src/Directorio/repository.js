@@ -104,10 +104,9 @@ const contar = async ({ q, departamentoId } = {}) => {
 
 const obtenerPorUsuario = async usuarioId => {
   try {
-    const result = await db.query(
-      `${SELECT_FICHA} WHERE c.usuario_id = $1`,
-      [usuarioId]
-    );
+    const result = await db.query(`${SELECT_FICHA} WHERE c.usuario_id = $1`, [
+      usuarioId,
+    ]);
 
     return result.rows[0] || null;
   } catch (error) {

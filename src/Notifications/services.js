@@ -26,7 +26,9 @@ const marcarLeida = async (id, usuarioId) => {
       throw createError('Notificación no encontrada', 404);
     }
 
-    return { noLeidas: await notificationsRepository.contarNoLeidas(usuarioId) };
+    return {
+      noLeidas: await notificationsRepository.contarNoLeidas(usuarioId),
+    };
   } catch (error) {
     if (error.isOperational) throw error;
     debug('Error marcando la notificación:', error);

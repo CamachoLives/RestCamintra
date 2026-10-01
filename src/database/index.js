@@ -22,13 +22,10 @@ const connectDB = () => {
 
         pool.on('connect', () => {
           debug('✅ Conectado a PostgreSQL');
-          if (config.isDevelopment) {
-          }
         });
 
         pool.on('error', err => {
           debug('❌ Error en la conexión:', err);
-          console.error('Database error:', err);
           reject(err);
         });
 

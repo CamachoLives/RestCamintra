@@ -21,24 +21,23 @@ const updateParametrizacionPlataforma = async (id, updateData) => {
   }
 };
 
-const getParametrizacionPlataforma = async (id) => {
+const getParametrizacionPlataforma = async id => {
   try {
     if (id) {
       const getParametrizacionPlataforma =
-      await configuracionRepository.getParametrizacionPlataforma(id);
-    if (!getParametrizacionPlataforma) {
-      return null;
-    }
+        await configuracionRepository.getParametrizacionPlataforma(id);
+      if (!getParametrizacionPlataforma) {
+        return null;
+      }
 
-    return getParametrizacionPlataforma;
+      return getParametrizacionPlataforma;
     }
-  } catch (error) {
-    throw new Error("Error al obtener el formulario de parametros!", 400);
-    
+  } catch {
+    throw new Error('Error al obtener el formulario de parametros!', 400);
   }
-}
+};
 
 module.exports.configuracionService = {
   updateParametrizacionPlataforma,
-  getParametrizacionPlataforma
+  getParametrizacionPlataforma,
 };

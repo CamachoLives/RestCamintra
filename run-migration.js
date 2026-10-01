@@ -52,10 +52,9 @@ const runMigrations = async () => {
       await pool.query('BEGIN');
       try {
         await pool.query(sql);
-        await pool.query(
-          'INSERT INTO schema_migrations (nombre) VALUES ($1)',
-          [file]
-        );
+        await pool.query('INSERT INTO schema_migrations (nombre) VALUES ($1)', [
+          file,
+        ]);
         await pool.query('COMMIT');
         console.log(`✅ ${file} aplicada`);
       } catch (error) {

@@ -15,7 +15,7 @@ module.exports.Profile = app => {
       '/',
       authenticateToken,
       validateRequest(profileSchemas.createProfile),
-      profileController.createProfile,
+      profileController.createProfile
     )
     .get('/me', authenticateToken, profileController.getMyProfile)
     .get('/:userId', authenticateToken, profileController.getProfile)
@@ -23,22 +23,21 @@ module.exports.Profile = app => {
       '/me',
       authenticateToken,
       validateRequest(profileSchemas.updateProfile),
-      profileController.updateProfile,
+      profileController.updateProfile
     )
     .put(
       '/:userId',
       authenticateToken,
       validateRequest(profileSchemas.updateProfile),
-      profileController.updateProfile,
+      profileController.updateProfile
     )
     .put(
       '/:userId/image',
       authenticateToken,
-      profileController.updateProfileImage,
+      profileController.updateProfileImage
     )
     .delete('/me', authenticateToken, profileController.deleteProfile)
     .delete('/:userId', authenticateToken, profileController.deleteProfile);
 
   app.use('/api/profile', router);
 };
-

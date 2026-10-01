@@ -60,7 +60,10 @@ const validarDatos = (datos, { parcial = false } = {}) => {
 
 const listar = async (opciones = {}) => {
   try {
-    const page = Math.max(parseInt(opciones.page) || PAGINATION.DEFAULT_PAGE, 1);
+    const page = Math.max(
+      parseInt(opciones.page) || PAGINATION.DEFAULT_PAGE,
+      1
+    );
     const limit = Math.min(
       parseInt(opciones.limit) || PAGINATION.DEFAULT_LIMIT,
       PAGINATION.MAX_LIMIT

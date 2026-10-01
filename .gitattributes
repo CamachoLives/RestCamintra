@@ -1,0 +1,14 @@
+# El repositorio guarda los archivos con LF, que es lo que espera
+# Prettier (endOfLine: lf). Sin esto, en Windows el checkout los
+# convierte a CRLF y `npm run format:check` falla en un clon nuevo.
+* text=auto eol=lf
+
+# Binarios: que git no los toque
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary

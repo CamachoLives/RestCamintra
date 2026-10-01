@@ -1,76 +1,49 @@
-const express = require('express');
-const cors = require('cors');
 require('dotenv').config();
 
 const debug = require('debug')('app:main');
-const app = express();
+const { crearApp } = require('./src/app');
+const config = require('./src/config/index');
+const db = require('./src/database/index');
 
-// Security and middleware imports
-const {
-  generalRateLimit,
-  helmetConfig,
-  sanitizeLogs,
-} = require('./src/middleware/security');
-const { errorHandler, notFound } = require('./src/middleware/errorHandler');
+const app = crearApp();
 
-// Modules
-const { configuracion } = require('./src/configuracion/');
-const { Auth } = require('./src/Auth/');
-const { activities } = require('./src/Activities/index');
-const { Users } = require('./src/Users/index');
-const { Profile } = require('./src/Profile/index');
-const { Directorio } = require('./src/Directorio/index');
-const { Comunicados } = require('./src/Comunicados/index');
-const { Calendar } = require('./src/Calendar/index');
-const { Documentos } = require('./src/Documentos/index');
-const { Dashboard } = require('./src/Dashboard/index');
-const { Notifications } = require('./src/Notifications/index');
-const listEndpoints = require('express-list-endpoints');
+const server = app.listen(config.port, () => {
+  debug(`Server is running on port: ${config.port}`);
+});
 
-// Security middleware
-app.use(helmetConfig);
-app.use(generalRateLimit);
-app.use(sanitizeLogs);
+/**
+ * Apagado ordenado.
+ *
+ * Sin esto, un redespliegue cortaba las peticiones en curso y dejaba las
+ * conexiones del pool de PostgreSQL abiertas hasta que el proceso moría.
+ */
+const apagar = async señal => {
+  debug(`${señal} recibido, cerrando el servidor...`);
 
-// CORS configuration
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:4200',
-    credentials: true,
-  })
-);
-
-// Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'Server is running',
-    timestamp: new Date().toISOString(),
+  server.close(async () => {
+    try {
+      await db.closePool();
+    } finally {
+      process.exit(0);
+    }
   });
+
+  // Si algo se queda colgado, no esperar para siempre
+  setTimeout(() => process.exit(1), 10000).unref();
+};
+
+process.on('SIGTERM', () => apagar('SIGTERM'));
+process.on('SIGINT', () => apagar('SIGINT'));
+
+// Un rechazo sin catch dejaba el proceso vivo pero en un estado incierto
+process.on('unhandledRejection', razon => {
+  debug('Promesa rechazada sin manejar:', razon);
+  apagar('unhandledRejection');
 });
 
-// Apps
-Auth(app);
-Users(app);
-configuracion(app);
-Directorio(app);
-Comunicados(app);
-Calendar(app);
-Documentos(app);
-Dashboard(app);
-Notifications(app);
-//activities(app);
-//Profile(app);
-
-// Error handling middleware
-app.use(notFound);
-app.use(errorHandler);
-
-const PORT = process.env.PORT || 7000;
-app.listen(PORT, () => {
-  debug(`Server is running on port: ${PORT}`);
+process.on('uncaughtException', error => {
+  debug('Excepción no capturada:', error);
+  process.exit(1);
 });
+
+module.exports = server;

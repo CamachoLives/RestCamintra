@@ -6,13 +6,15 @@
   "scripts": {
     "dev": "set DEBUG=app:* & Nodemon index.js",
     "start": "node index.js",
-    "lint": "eslint src/**/*.js",
-    "lint:fix": "eslint src/**/*.js --fix",
+    "lint": "eslint src tests",
+    "lint:fix": "eslint src tests --fix",
     "format": "prettier --write src/**/*.js",
     "format:check": "prettier --check src/**/*.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "migrate": "node run-migration.js",
-    "seed:admin": "node scripts/seed-admin.js"
+    "seed:admin": "node scripts/seed-admin.js",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "keywords": [],
   "author": "",
@@ -41,7 +43,9 @@
     "eslint": "^9.36.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
+    "jest": "^30.5.2",
     "nodemon": "^3.1.10",
-    "prettier": "^3.6.2"
+    "prettier": "^3.6.2",
+    "supertest": "^7.3.0"
   }
 }

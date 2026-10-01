@@ -57,6 +57,23 @@ module.exports = [
     },
   },
   {
-    ignores: ['node_modules/', 'dist/', 'build/', '*.min.js'],
+    // Las pruebas corren en Jest, que inyecta sus globales
+    files: ['tests/**/*.js'],
+    languageOptions: {
+      globals: {
+        describe: 'readonly',
+        it: 'readonly',
+        test: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        jest: 'readonly',
+      },
+    },
+  },
+  {
+    ignores: ['node_modules/', 'dist/', 'build/', 'coverage/', '*.min.js'],
   },
 ];

@@ -76,7 +76,9 @@ const VALIDATION = {
 
 const RATE_LIMITS = {
   AUTH_WINDOW_MS: 15 * 60 * 1000, // 15 minutos
-  AUTH_MAX_ATTEMPTS: 5,
+  // Una oficina entera sale por la misma IP publica, asi que 5 intentos
+  // bloquearian a todos por el error de uno.
+  AUTH_MAX_ATTEMPTS: 15,
   GENERAL_WINDOW_MS: 15 * 60 * 1000, // 15 minutos
   GENERAL_MAX_REQUESTS: 100,
 };

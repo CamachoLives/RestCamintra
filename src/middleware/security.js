@@ -1,11 +1,12 @@
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const jwt = require('jsonwebtoken');
 const debug = require('debug')('app:security');
+const { verificar } = require('../common/tokens');
+const { RATE_LIMITS, ERROR_MESSAGES } = require('../constants/index');
 
 // Configuración de rate limiting
-const createRateLimit = (windowMs, max, message) => {
-  return rateLimit({
+const createRateLimit = (windowMs, max, message) =>
+  rateLimit({
     windowMs,
     max,
     message: {
@@ -15,46 +16,45 @@ const createRateLimit = (windowMs, max, message) => {
     standardHeaders: true,
     legacyHeaders: false,
   });
-};
 
-// Rate limit para autenticación (más restrictivo)
+// Rate limit para autenticación (más restrictivo).
+// Los límites viven en constants para que no haya dos números distintos
+// documentados y aplicados.
 const authRateLimit = createRateLimit(
-  15 * 60 * 1000, // 15 minutos
-  15, // máximo 15 intentos
+  RATE_LIMITS.AUTH_WINDOW_MS,
+  RATE_LIMITS.AUTH_MAX_ATTEMPTS,
   'Demasiados intentos de login, intenta en 15 minutos'
 );
 
 // Rate limit general
 const generalRateLimit = createRateLimit(
-  15 * 60 * 1000, // 15 minutos
-  100, // máximo 100 requests
+  RATE_LIMITS.GENERAL_WINDOW_MS,
+  RATE_LIMITS.GENERAL_MAX_REQUESTS,
   'Demasiadas solicitudes, intenta más tarde'
 );
 
 // Middleware de autenticación JWT
 const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+  const authHeader = req.headers['authorization'] || '';
+  const [esquema, token] = authHeader.split(' ');
 
-  if (!token) {
+  if (!token || esquema !== 'Bearer') {
     return res.status(401).json({
       success: false,
-      message: 'Token de acceso requerido',
+      message: ERROR_MESSAGES.TOKEN_REQUIRED,
     });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) {
-      debug('Token verification failed:', err.message);
-      return res.status(403).json({
-        success: false,
-        message: 'Token inválido o expirado',
-      });
-    }
-
-    req.user = user;
+  try {
+    req.user = verificar(token);
     next();
-  });
+  } catch (error) {
+    debug('Token verification failed:', error.message);
+    return res.status(403).json({
+      success: false,
+      message: ERROR_MESSAGES.TOKEN_INVALID,
+    });
+  }
 };
 
 // Middleware de autorización por rol.
@@ -64,7 +64,7 @@ const authorizeRoles = (...rolesPermitidos) => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        message: 'Token de acceso requerido',
+        message: ERROR_MESSAGES.TOKEN_REQUIRED,
       });
     }
 
@@ -93,7 +93,7 @@ const sanitizeLogs = (req, res, next) => {
     if (typeof data === 'string') {
       try {
         const parsed = JSON.parse(data);
-        if (parsed.token || parsed.password) {
+        if (parsed.token || parsed.password || parsed.data?.token) {
           debug('Response contains sensitive data, not logging');
           return originalSend.call(this, data);
         }
@@ -123,6 +123,7 @@ const helmetConfig = helmet({
 });
 
 module.exports = {
+  createRateLimit,
   authRateLimit,
   generalRateLimit,
   authenticateToken,

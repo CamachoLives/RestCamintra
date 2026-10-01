@@ -6,10 +6,12 @@ const router = express.Router();
 
 module.exports.Auth = app => {
   router
+    // El rate limit y la validación estaban comentados: /login quedaba
+    // abierto a fuerza bruta y aceptaba cualquier cuerpo, incluso vacío.
     .post(
       '/login',
-      //authRateLimit,
-      //validateRequest(authSchemas.login),
+      authRateLimit,
+      validateRequest(authSchemas.login),
       AuthController.Login
     )
     .post(

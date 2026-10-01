@@ -1,5 +1,10 @@
 require('dotenv').config();
 
+// Valor de ejemplo del env.example: sirve para desarrollo, nunca en
+// produccion.
+const JWT_SECRET_EJEMPLO =
+  'your_super_secret_jwt_key_here_change_in_production';
+
 const config = {
   // Database Configuration
   dbHost: process.env.DB_HOST || 'localhost',
@@ -9,9 +14,7 @@ const config = {
   dbName: process.env.DB_NAME || 'calendar',
 
   // JWT Configuration
-  jwtSecret:
-    process.env.JWT_SECRET ||
-    'your_super_secret_jwt_key_here_change_in_production',
+  jwtSecret: process.env.JWT_SECRET || JWT_SECRET_EJEMPLO,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1h',
 
   // Server Configuration
@@ -39,6 +42,13 @@ if (config.isProduction) {
   if (missingVars.length > 0) {
     throw new Error(
       `Missing required environment variables: ${missingVars.join(', ')}`
+    );
+  }
+
+  // Con el secreto de ejemplo cualquiera puede firmar un token de admin
+  if (config.jwtSecret === JWT_SECRET_EJEMPLO) {
+    throw new Error(
+      'JWT_SECRET sigue siendo el valor de ejemplo: cambialo antes de desplegar'
     );
   }
 }

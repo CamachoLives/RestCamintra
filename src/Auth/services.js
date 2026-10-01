@@ -1,11 +1,10 @@
 const { authRepository } = require('./repository');
 const { UsersRepository } = require('../Users/repository');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const { firmar, verificar } = require('../common/tokens');
 const { createError } = require('../middleware/errorHandler');
+const config = require('../config/index');
 const debug = require('debug')('app:auth-services');
-
-const { JWT_SECRET, JWT_EXPIRES_IN, BCRYPT_ROUNDS } = process.env;
 
 // El teclado del movil capitaliza y el autocompletado deja espacios:
 // el email se normaliza antes de buscar y antes de guardar.
@@ -39,21 +38,12 @@ const Login = async (email, password) => {
       throw createError('Credenciales inválidas', 401);
     }
 
-    // Generar token JWT
-    const token = jwt.sign(
-      {
-        id: user.id,
-        email: user.email,
-        nombre: user.nombre,
-        rol: user.rol || 'colaborador',
-      },
-      JWT_SECRET,
-      {
-        expiresIn: JWT_EXPIRES_IN || '1h',
-        issuer: 'calendario-app',
-        audience: 'calendario-users',
-      }
-    );
+    const token = firmar({
+      id: user.id,
+      email: user.email,
+      nombre: user.nombre,
+      rol: user.rol || 'colaborador',
+    });
 
     // Sello de último acceso para el panel de administración
     await UsersRepository.updateUltimoAcceso(user.id);
@@ -84,7 +74,7 @@ const Register = async (nombre, email, password) => {
     }
 
     // Hash de la contraseña
-    const saltRounds = parseInt(BCRYPT_ROUNDS) || 10;
+    const saltRounds = config.bcryptRounds;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     // Crear nuevo usuario
@@ -113,7 +103,7 @@ const Register = async (nombre, email, password) => {
 // Función para verificar token (útil para middleware)
 const verifyToken = token => {
   try {
-    return jwt.verify(token, JWT_SECRET);
+    return verificar(token);
   } catch {
     throw createError('Token inválido', 401);
   }

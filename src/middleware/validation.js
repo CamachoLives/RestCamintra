@@ -8,8 +8,11 @@ const authSchemas = {
       'string.email': 'El email debe tener un formato válido',
       'any.required': 'El email es requerido',
     }),
-    password: Joi.string().min(6).required().messages({
-      'string.min': 'La contraseña debe tener al menos 6 caracteres',
+    // En el login no se exige longitud mínima: la política de
+    // contraseñas se aplica al registrarse. Pedirla aquí devolvería un
+    // 400 a quien tenga una clave antigua más corta, en vez del 401 que
+    // corresponde.
+    password: Joi.string().required().messages({
       'any.required': 'La contraseña es requerida',
     }),
   }),

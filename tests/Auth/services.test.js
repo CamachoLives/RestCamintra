@@ -181,10 +181,12 @@ describe('AuthServices.Register', () => {
 });
 
 describe('AuthServices.verifyToken', () => {
-  it('devuelve el payload de un token válido', () => {
-    const token = jwt.sign({ id: 7 }, process.env.JWT_SECRET);
+  it('devuelve el payload de un token emitido por la propia API', () => {
+    const { firmar } = require('../../src/common/tokens');
 
-    expect(AuthServices.verifyToken(token)).toMatchObject({ id: 7 });
+    expect(AuthServices.verifyToken(firmar({ id: 7 }))).toMatchObject({
+      id: 7,
+    });
   });
 
   it('rechaza un token firmado con otro secreto', () => {
@@ -193,9 +195,17 @@ describe('AuthServices.verifyToken', () => {
     expect(() => AuthServices.verifyToken(token)).toThrow('Token inválido');
   });
 
+  it('rechaza un token sin issuer ni audience de la intranet', () => {
+    const token = jwt.sign({ id: 7 }, process.env.JWT_SECRET);
+
+    expect(() => AuthServices.verifyToken(token)).toThrow('Token inválido');
+  });
+
   it('rechaza un token expirado', () => {
     const token = jwt.sign({ id: 7 }, process.env.JWT_SECRET, {
       expiresIn: '-1s',
+      issuer: 'calendario-app',
+      audience: 'calendario-users',
     });
 
     expect(() => AuthServices.verifyToken(token)).toThrow('Token inválido');

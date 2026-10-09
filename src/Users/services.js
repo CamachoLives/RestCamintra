@@ -1,26 +1,44 @@
 const { UsersRepository } = require('./repository');
 const { createError } = require('../middleware/errorHandler');
+const { PAGINATION } = require('../constants/index');
 const debug = require('debug')('app:users-service');
 
+/**
+ * Listado paginado de usuarios.
+ *
+ * Antes devolvia un array pelado: el panel de administracion recibia 10
+ * filas y no tenia forma de saber si habia 11 o 11.000, asi que no podia
+ * pintar la paginacion. Ahora responde el mismo sobre que el resto de los
+ * listados de la API.
+ */
 const getAllUsers = async (options = {}) => {
   try {
-    const { email, rol, page = 1, limit = 10 } = options;
+    const { email, rol } = options;
+    const page = Math.max(parseInt(options.page) || PAGINATION.DEFAULT_PAGE, 1);
+    const limit = Math.min(
+      parseInt(options.limit) || PAGINATION.DEFAULT_LIMIT,
+      PAGINATION.MAX_LIMIT
+    );
 
-    const users = await UsersRepository.getAllUsers({
-      email,
-      rol,
-      page: parseInt(page),
-      limit: parseInt(limit),
-    });
+    const [items, total] = await Promise.all([
+      UsersRepository.getAllUsers({ email, rol, page, limit }),
+      UsersRepository.contarUsuarios({ email, rol }),
+    ]);
 
-    debug(`Retrieved ${users.length} users`);
-    return users;
+    debug(`Retrieved ${items.length} of ${total} users`);
+
+    return {
+      items,
+      total,
+      page,
+      limit,
+      totalPaginas: Math.ceil(total / limit) || 1,
+    };
   } catch (error) {
     debug('Error getting all users:', error);
     throw createError('Error al obtener los usuarios', 500);
   }
 };
-
 const getUserById = async id => {
   try {
     if (!id) {

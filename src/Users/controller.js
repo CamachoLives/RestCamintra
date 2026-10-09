@@ -5,21 +5,20 @@ const { createError } = require('../middleware/errorHandler');
 module.exports.usersController = {
   getAllUsers: async (req, res, next) => {
     try {
-      const { email, rol, page = 1, limit = 10 } = req.query;
+      const { email, rol, page, limit } = req.query;
 
-      const users = await usersService.getAllUsers({
+      const resultado = await usersService.getAllUsers({
         email,
         rol,
-        page: parseInt(page),
-        limit: parseInt(limit),
+        page,
+        limit,
       });
 
-      response.success(res, 'Usuarios obtenidos exitosamente', 200, users);
+      response.success(res, 'Usuarios obtenidos exitosamente', 200, resultado);
     } catch (error) {
       next(error);
     }
   },
-
   // Datos del usuario del token, sin tener que conocer su id
   getMe: async (req, res, next) => {
     try {

@@ -18,6 +18,28 @@ const CAMPOS_PUBLICOS_SIN_ALIAS = CAMPOS_PUBLICOS.replace(/u\./g, '');
 
 // Solo estas columnas se dejan actualizar desde la API
 const CAMPOS_EDITABLES = ['nombre', 'email', 'rol', 'activo'];
+// Los filtros del listado, armados una sola vez para que contar() y
+// getAllUsers() no puedan desincronizarse y devolver un total que no
+// corresponde a las filas.
+const construirFiltros = ({ email, rol } = {}) => {
+  const condiciones = [];
+  const valores = [];
+
+  if (email) {
+    valores.push(`%${email}%`);
+    condiciones.push(`u.email ILIKE $${valores.length}`);
+  }
+
+  if (rol) {
+    valores.push(rol);
+    condiciones.push(`u.rol = $${valores.length}`);
+  }
+
+  return {
+    where: condiciones.length ? `WHERE ${condiciones.join(' AND ')}` : '',
+    valores,
+  };
+};
 
 const getUserById = async id => {
   try {
@@ -35,22 +57,7 @@ const getUserById = async id => {
 
 const getAllUsers = async ({ email, rol, page = 1, limit = 10 } = {}) => {
   try {
-    const condiciones = [];
-    const valores = [];
-
-    if (email) {
-      valores.push(`%${email}%`);
-      condiciones.push(`u.email ILIKE $${valores.length}`);
-    }
-
-    if (rol) {
-      valores.push(rol);
-      condiciones.push(`u.rol = $${valores.length}`);
-    }
-
-    const where = condiciones.length
-      ? `WHERE ${condiciones.join(' AND ')}`
-      : '';
+    const { where, valores } = construirFiltros({ email, rol });
 
     valores.push(limit);
     valores.push((page - 1) * limit);
@@ -71,6 +78,23 @@ const getAllUsers = async ({ email, rol, page = 1, limit = 10 } = {}) => {
   }
 };
 
+// Cuántos usuarios hay con esos filtros, para que el panel sepa
+// cuántas páginas pintar.
+const contarUsuarios = async ({ email, rol } = {}) => {
+  try {
+    const { where, valores } = construirFiltros({ email, rol });
+
+    const result = await db.query(
+      `SELECT COUNT(*)::int AS total FROM usuarios u ${where}`,
+      valores
+    );
+
+    return result.rows[0].total;
+  } catch (error) {
+    debug('Error contando usuarios:', error);
+    throw error;
+  }
+};
 const updateUser = async (id, updateData) => {
   try {
     const sets = [];
@@ -132,6 +156,7 @@ const updateUltimoAcceso = async id => {
 
 module.exports.UsersRepository = {
   getUserById,
+  contarUsuarios,
   getAllUsers,
   updateUser,
   deleteUser,

@@ -5,11 +5,17 @@ const debug = require('debug')('app:documentos-service');
 
 const ESTADOS = ['borrador', 'publicado', 'archivado'];
 
+// Marcas diacríticas de Unicode: la tilde que NFD separa de la letra.
+// Antes este rango estaba escrito con los caracteres combinantes
+// literales, invisibles en el editor y a merced de la codificación con
+// la que se guardara el archivo.
+const DIACRITICOS = /[\u0300-\u036f]/g;
+
 // "Política de Vacaciones 2026" -> "politica-de-vacaciones-2026"
 const generarSlug = titulo =>
-  titulo
+  String(titulo ?? '')
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(DIACRITICOS, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')

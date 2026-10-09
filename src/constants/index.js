@@ -25,7 +25,6 @@ const ERROR_MESSAGES = {
 
   // Recursos
   USER_NOT_FOUND: 'Usuario no encontrado',
-  ACTIVITY_NOT_FOUND: 'Actividad no encontrada',
   RESOURCE_NOT_FOUND: 'Recurso no encontrado',
 
   // Base de datos
@@ -55,7 +54,6 @@ const SUCCESS_MESSAGES = {
 
 const COLLECTIONS = {
   USERS: 'users',
-  ACTIVITIES: 'activities',
   CALENDAR: 'calendar',
   NOTIFICATIONS: 'notifications',
 };

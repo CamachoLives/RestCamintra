@@ -42,74 +42,6 @@ const authSchemas = {
   }),
 };
 
-const profileSchemas = {
-  createProfile: Joi.object({
-    userId: Joi.string().required().messages({
-      'any.required': 'El ID de usuario es requerido',
-    }),
-    biografia: Joi.string().max(500).allow('').messages({
-      'string.max': 'La biografía no puede exceder 500 caracteres',
-    }),
-    area: Joi.string().max(100).required().messages({
-      'string.max': 'El área no puede exceder 100 caracteres',
-      'any.required': 'El área es requerida',
-    }),
-    telefono: Joi.string()
-      .pattern(/^[0-9+\-\s()]+$/)
-      .max(20)
-      .allow('')
-      .messages({
-        'string.pattern.base': 'El teléfono debe tener un formato válido',
-        'string.max': 'El teléfono no puede exceder 20 caracteres',
-      }),
-    ubicacion: Joi.string().max(100).allow('').messages({
-      'string.max': 'La ubicación no puede exceder 100 caracteres',
-    }),
-    sitioWeb: Joi.string().uri().allow('').messages({
-      'string.uri': 'El sitio web debe ser una URL válida',
-    }),
-    redesSociales: Joi.object({
-      linkedin: Joi.string().uri().allow(''),
-      twitter: Joi.string().uri().allow(''),
-      github: Joi.string().uri().allow(''),
-    }).optional(),
-  }),
-
-  updateProfile: Joi.object({
-    biografia: Joi.string().max(500).allow('').messages({
-      'string.max': 'La biografía no puede exceder 500 caracteres',
-    }),
-    area: Joi.string().max(100).messages({
-      'string.max': 'El área no puede exceder 100 caracteres',
-    }),
-    telefono: Joi.string()
-      .pattern(/^[0-9+\-\s()]+$/)
-      .max(20)
-      .allow('')
-      .messages({
-        'string.pattern.base': 'El teléfono debe tener un formato válido',
-        'string.max': 'El teléfono no puede exceder 20 caracteres',
-      }),
-    ubicacion: Joi.string().max(100).allow('').messages({
-      'string.max': 'La ubicación no puede exceder 100 caracteres',
-    }),
-    sitioWeb: Joi.string().uri().allow('').messages({
-      'string.uri': 'El sitio web debe ser una URL válida',
-    }),
-    redesSociales: Joi.object({
-      linkedin: Joi.string().uri().allow(''),
-      twitter: Joi.string().uri().allow(''),
-      github: Joi.string().uri().allow(''),
-    }).optional(),
-  }),
-
-  uploadImage: Joi.object({
-    userId: Joi.string().required().messages({
-      'any.required': 'El ID de usuario es requerido',
-    }),
-  }),
-};
-
 // Middleware de validación
 const validateRequest = schema => {
   return (req, res, next) => {
@@ -150,7 +82,6 @@ const handleValidationErrors = (req, res, next) => {
 
 module.exports = {
   authSchemas,
-  profileSchemas,
   validateRequest,
   handleValidationErrors,
 };
